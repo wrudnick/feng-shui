@@ -41,6 +41,11 @@ export class CanvasManager {
   _setupEvents() {
     window.addEventListener('resize', () => this.resize());
 
+    // ResizeObserver ensures canvas matches container even after layout shifts
+    if (typeof ResizeObserver !== 'undefined') {
+      new ResizeObserver(() => this.resize()).observe(this.canvas.parentElement);
+    }
+
     this.canvas.addEventListener('wheel', (e) => {
       e.preventDefault();
       const delta = -e.deltaY * 0.001;

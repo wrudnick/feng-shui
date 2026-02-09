@@ -487,22 +487,23 @@ button:disabled {
     justify-content: center;
   }
 
-  /* Remove toolbar from flex flow entirely on mobile */
+  /* Toolbar completely hidden on mobile until opened */
   #toolbar {
+    display: none !important;
     position: fixed;
     top: 0;
     left: 0;
     bottom: 0;
     z-index: 100;
     width: 200px;
-    transform: translateX(-100%);
-    transition: transform 0.25s ease;
     box-shadow: 4px 0 20px rgba(0, 0, 0, 0.5);
     padding-top: 12px;
   }
 
   #toolbar.open {
-    transform: translateX(0);
+    display: flex !important;
+    flex-direction: column;
+    gap: 16px;
   }
 
   /* Overlay backdrop */
