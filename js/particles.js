@@ -7,7 +7,7 @@ export class ParticleSystem {
     this.grid = grid;
     this.maxParticles = maxParticles;
     this.particles = [];
-    this.trailLength = 24;
+    this.trailLength = 40;
     this.sourcePositions = [];
   }
 
@@ -32,7 +32,7 @@ export class ParticleSystem {
       trail: [],
       life: 1.0,
       age: 0,
-      maxAge: 400 + Math.random() * 600,
+      maxAge: 800 + Math.random() * 1200,
       stagnantFrames: 0,
     };
   }
@@ -45,9 +45,9 @@ export class ParticleSystem {
   update(dt = 1) {
     const g = this.grid;
     const maxSpeed = g.getMaxSpeed();
-    // Normalize movement so particles traverse the room in reasonable time
-    // Target: fastest particle moves ~1.5 grid cells per frame
-    const moveScale = maxSpeed > 0 ? 1.5 / maxSpeed : 1;
+    // Scale so fastest particles move ~5 grid cells per frame
+    // On a 200-cell grid that means crossing the room in ~40 frames (<1 sec)
+    const moveScale = maxSpeed > 0 ? 5.0 / maxSpeed : 1;
 
     // Spawn new particles
     while (this.particles.length < this.maxParticles) {
