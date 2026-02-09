@@ -51,6 +51,58 @@ function setupToolbar() {
   });
 }
 
+function setupCollapsibleSections() {
+  document.querySelectorAll('.section-toggle').forEach(toggle => {
+    toggle.addEventListener('click', () => {
+      toggle.classList.toggle('collapsed');
+      const content = toggle.nextElementSibling;
+      if (content && content.classList.contains('section-content')) {
+        content.classList.toggle('collapsed');
+      }
+    });
+  });
+}
+
+function setupMobileToolbar() {
+  const toggleBtn = document.getElementById('toolbar-toggle');
+  const toolbar = document.getElementById('toolbar');
+  const main = document.getElementById('main');
+
+  // Create backdrop element for mobile overlay
+  const backdrop = document.createElement('div');
+  backdrop.className = 'toolbar-backdrop';
+  main.appendChild(backdrop);
+
+  function openToolbar() {
+    toolbar.classList.add('open');
+    backdrop.classList.add('visible');
+  }
+
+  function closeToolbar() {
+    toolbar.classList.remove('open');
+    backdrop.classList.remove('visible');
+  }
+
+  toggleBtn.addEventListener('click', () => {
+    if (toolbar.classList.contains('open')) {
+      closeToolbar();
+    } else {
+      openToolbar();
+    }
+  });
+
+  backdrop.addEventListener('click', closeToolbar);
+
+  // Close toolbar when a tool is selected on mobile
+  toolbar.addEventListener('click', (e) => {
+    if (e.target.closest('.tool-btn') || e.target.closest('.template-btn')) {
+      if (window.innerWidth <= 768) {
+        closeToolbar();
+      }
+    }
+  });
+}
+
 function setupFurnitureCatalog() {
   const container = document.getElementById('furniture-catalog');
   for (const item of FURNITURE_CATALOG) {
@@ -145,12 +197,14 @@ function setupCanvasEvents() {
     const sx = e.clientX - rect.left;
     const sy = e.clientY - rect.top;
 
-    // Middle mouse or space+click = pan
-    if (e.button === 1 || (e.button === 0 && spaceDown)) {
+    // Middle mouse, space+click, or move tool = pan
+    if (e.button === 1 || (e.button === 0 && spaceDown) || (e.button === 0 && editor.currentTool === 'move')) {
       canvas.isPanning = true;
       canvas.panStartX = sx - canvas.panX;
       canvas.panStartY = sy - canvas.panY;
       el.style.cursor = 'grabbing';
+      const container = document.getElementById('canvas-container');
+      container.classList.add('panning');
       return;
     }
 
@@ -191,6 +245,8 @@ function setupCanvasEvents() {
     if (canvas.isPanning) {
       canvas.isPanning = false;
       el.style.cursor = '';
+      const container = document.getElementById('canvas-container');
+      container.classList.remove('panning');
       return;
     }
     editor.handleMouseUp();
@@ -207,6 +263,154 @@ function setupCanvasEvents() {
     editor.selectedItem = null;
   });
 
+  // --- Touch events for mobile ---
+  let touchState = {
+    active: false,
+    startX: 0,
+    startY: 0,
+    lastX: 0,
+    lastY: 0,
+    pinchDist: 0,
+    isPinching: false,
+    isPanning: false,
+    touchId: null,
+  };
+
+  function getTouchPos(touch) {
+    const rect = el.getBoundingClientRect();
+    return { x: touch.clientX - rect.left, y: touch.clientY - rect.top };
+  }
+
+  function getPinchDist(touches) {
+    const dx = touches[0].clientX - touches[1].clientX;
+    const dy = touches[0].clientY - touches[1].clientY;
+    return Math.hypot(dx, dy);
+  }
+
+  function getPinchCenter(touches) {
+    const rect = el.getBoundingClientRect();
+    return {
+      x: (touches[0].clientX + touches[1].clientX) / 2 - rect.left,
+      y: (touches[0].clientY + touches[1].clientY) / 2 - rect.top,
+    };
+  }
+
+  el.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+
+    if (e.touches.length === 2) {
+      // Pinch zoom
+      touchState.isPinching = true;
+      touchState.isPanning = false;
+      touchState.pinchDist = getPinchDist(e.touches);
+      touchState.pinchCenter = getPinchCenter(e.touches);
+      return;
+    }
+
+    if (e.touches.length !== 1) return;
+
+    const pos = getTouchPos(e.touches[0]);
+    touchState.active = true;
+    touchState.startX = pos.x;
+    touchState.startY = pos.y;
+    touchState.lastX = pos.x;
+    touchState.lastY = pos.y;
+    touchState.touchId = e.touches[0].identifier;
+    touchState.isPanning = false;
+    touchState.moved = false;
+
+    // If move tool, start panning immediately
+    if (editor.currentTool === 'move') {
+      touchState.isPanning = true;
+      canvas.panStartX = pos.x - canvas.panX;
+      canvas.panStartY = pos.y - canvas.panY;
+    }
+  }, { passive: false });
+
+  el.addEventListener('touchmove', (e) => {
+    e.preventDefault();
+
+    // Pinch zoom
+    if (touchState.isPinching && e.touches.length === 2) {
+      const newDist = getPinchDist(e.touches);
+      const center = getPinchCenter(e.touches);
+      const scale = newDist / touchState.pinchDist;
+      const oldZoom = canvas.zoom;
+      canvas.zoom = Math.max(canvas.minZoom, Math.min(canvas.maxZoom, canvas.zoom * scale));
+      canvas.panX = center.x - (center.x - canvas.panX) * (canvas.zoom / oldZoom);
+      canvas.panY = center.y - (center.y - canvas.panY) * (canvas.zoom / oldZoom);
+      touchState.pinchDist = newDist;
+      return;
+    }
+
+    if (!touchState.active || e.touches.length !== 1) return;
+
+    const pos = getTouchPos(e.touches[0]);
+    const dx = pos.x - touchState.lastX;
+    const dy = pos.y - touchState.lastY;
+
+    // Detect if we should start panning (drag > threshold and not move tool)
+    if (!touchState.isPanning && !touchState.moved) {
+      const dist = Math.hypot(pos.x - touchState.startX, pos.y - touchState.startY);
+      if (dist > 10) {
+        touchState.moved = true;
+        // On move tool, always pan. On other tools with two-finger reserved for pan,
+        // single finger does the tool action. But for convenience, if no tool action
+        // is actively drawing, we use single finger to pan on move tool.
+        if (editor.currentTool === 'move') {
+          touchState.isPanning = true;
+          canvas.panStartX = touchState.startX - canvas.panX;
+          canvas.panStartY = touchState.startY - canvas.panY;
+        }
+      }
+    }
+
+    if (touchState.isPanning) {
+      canvas.panX = pos.x - canvas.panStartX;
+      canvas.panY = pos.y - canvas.panStartY;
+    } else {
+      // Forward to editor as mouse move
+      const world = canvas.screenToWorld(pos.x, pos.y);
+      const snapped = canvas.snapToGrid(world.x, world.y);
+      editor.setPreviewPosition(snapped.x, snapped.y);
+      editor.handleMouseMove(world.x, world.y);
+
+      document.getElementById('status-coords').textContent =
+        `${Math.round(world.x)}, ${Math.round(world.y)}`;
+    }
+
+    touchState.lastX = pos.x;
+    touchState.lastY = pos.y;
+  }, { passive: false });
+
+  el.addEventListener('touchend', (e) => {
+    e.preventDefault();
+
+    if (touchState.isPinching) {
+      if (e.touches.length < 2) {
+        touchState.isPinching = false;
+      }
+      return;
+    }
+
+    if (!touchState.active) return;
+
+    // If it was a tap (no significant movement), treat as click
+    if (!touchState.moved && !touchState.isPanning) {
+      const pos = { x: touchState.startX, y: touchState.startY };
+      const world = canvas.screenToWorld(pos.x, pos.y);
+      const snapped = canvas.snapToGrid(world.x, world.y);
+      editor.handleMouseDown(world.x, world.y, snapped.x, snapped.y);
+      editor.handleMouseUp();
+    } else {
+      editor.handleMouseUp();
+    }
+
+    touchState.active = false;
+    touchState.isPanning = false;
+    touchState.moved = false;
+  }, { passive: false });
+
   // Keyboard
   document.addEventListener('keydown', (e) => {
     if (e.code === 'Space') {
@@ -216,7 +420,7 @@ function setupCanvasEvents() {
 
     // Tool shortcuts
     if (!e.ctrlKey && !e.metaKey) {
-      const toolMap = { v: 'select', w: 'wall', d: 'door', n: 'window', f: 'furniture', e: 'erase' };
+      const toolMap = { v: 'select', w: 'wall', d: 'door', n: 'window', f: 'furniture', m: 'move', e: 'erase' };
       if (toolMap[e.key]) {
         document.querySelector(`[data-tool="${toolMap[e.key]}"]`)?.click();
         return;
@@ -450,6 +654,8 @@ function render() {
 
 function init() {
   setupToolbar();
+  setupCollapsibleSections();
+  setupMobileToolbar();
   setupFurnitureCatalog();
   setupTemplates();
   setupImageUpload();

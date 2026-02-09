@@ -24,55 +24,68 @@
     </header>
 
     <div id="main">
+      <button id="toolbar-toggle" aria-label="Toggle toolbar">
+        <svg viewBox="0 0 24 24" width="20" height="20"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+      </button>
       <aside id="toolbar">
         <div class="tool-section">
-          <h3>Tools</h3>
-          <button class="tool-btn active" data-tool="select" title="Select / Move (V)">
-            <svg viewBox="0 0 24 24" width="20" height="20"><path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z" fill="currentColor"/></svg>
-            <span>Select</span>
-          </button>
-          <button class="tool-btn" data-tool="wall" title="Draw Wall (W)">
-            <svg viewBox="0 0 24 24" width="20" height="20"><rect x="2" y="10" width="20" height="4" fill="currentColor"/></svg>
-            <span>Wall</span>
-          </button>
-          <button class="tool-btn" data-tool="door" title="Place Door (D)">
-            <svg viewBox="0 0 24 24" width="20" height="20"><path d="M3 21V3h7v18H3zm7-9a1 1 0 100-2 1 1 0 000 2z" fill="currentColor"/><path d="M12 3h6v18h-6" stroke="currentColor" fill="none" stroke-width="1.5" stroke-dasharray="3 2"/></svg>
-            <span>Door</span>
-          </button>
-          <button class="tool-btn" data-tool="window" title="Place Window (N)">
-            <svg viewBox="0 0 24 24" width="20" height="20"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" fill="none" stroke-width="2"/><line x1="12" y1="3" x2="12" y2="21" stroke="currentColor" stroke-width="2"/><line x1="3" y1="12" x2="21" y2="12" stroke="currentColor" stroke-width="2"/></svg>
-            <span>Window</span>
-          </button>
-          <button class="tool-btn" data-tool="furniture" title="Place Furniture (F)">
-            <svg viewBox="0 0 24 24" width="20" height="20"><rect x="4" y="8" width="16" height="8" rx="2" fill="currentColor"/><rect x="6" y="16" width="2" height="4" fill="currentColor"/><rect x="16" y="16" width="2" height="4" fill="currentColor"/></svg>
-            <span>Furniture</span>
-          </button>
-          <button class="tool-btn" data-tool="erase" title="Erase (E)">
-            <svg viewBox="0 0 24 24" width="20" height="20"><path d="M16.24 3.56l4.95 4.94c.78.79.78 2.05 0 2.84L12 20.53a4 4 0 01-2.83 1.17H4l1.59-1.59 8.49-8.48-4.95-4.95 2.83-2.83a2 2 0 012.83 0l1.45 1.45z" fill="currentColor"/></svg>
-            <span>Erase</span>
-          </button>
+          <h3 class="section-toggle">Tools <span class="toggle-arrow"></span></h3>
+          <div class="section-content">
+            <button class="tool-btn active" data-tool="select" title="Select / Move (V)">
+              <svg viewBox="0 0 24 24" width="20" height="20"><path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z" fill="currentColor"/></svg>
+              <span>Select</span>
+            </button>
+            <button class="tool-btn" data-tool="wall" title="Draw Wall (W)">
+              <svg viewBox="0 0 24 24" width="20" height="20"><rect x="2" y="10" width="20" height="4" fill="currentColor"/></svg>
+              <span>Wall</span>
+            </button>
+            <button class="tool-btn" data-tool="door" title="Place Door (D)">
+              <svg viewBox="0 0 24 24" width="20" height="20"><path d="M3 21V3h7v18H3zm7-9a1 1 0 100-2 1 1 0 000 2z" fill="currentColor"/><path d="M12 3h6v18h-6" stroke="currentColor" fill="none" stroke-width="1.5" stroke-dasharray="3 2"/></svg>
+              <span>Door</span>
+            </button>
+            <button class="tool-btn" data-tool="window" title="Place Window (N)">
+              <svg viewBox="0 0 24 24" width="20" height="20"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" fill="none" stroke-width="2"/><line x1="12" y1="3" x2="12" y2="21" stroke="currentColor" stroke-width="2"/><line x1="3" y1="12" x2="21" y2="12" stroke="currentColor" stroke-width="2"/></svg>
+              <span>Window</span>
+            </button>
+            <button class="tool-btn" data-tool="furniture" title="Place Furniture (F)">
+              <svg viewBox="0 0 24 24" width="20" height="20"><rect x="4" y="8" width="16" height="8" rx="2" fill="currentColor"/><rect x="6" y="16" width="2" height="4" fill="currentColor"/><rect x="16" y="16" width="2" height="4" fill="currentColor"/></svg>
+              <span>Furniture</span>
+            </button>
+            <button class="tool-btn" data-tool="move" title="Move Canvas (M)">
+              <svg viewBox="0 0 24 24" width="20" height="20"><path d="M12 2l3 3h-2v4h4v-2l3 3-3 3v-2h-4v4h2l-3 3-3-3h2v-4H7v2l-3-3 3-3v2h4V5H9l3-3z" fill="currentColor"/></svg>
+              <span>Move</span>
+            </button>
+            <button class="tool-btn" data-tool="erase" title="Erase (E)">
+              <svg viewBox="0 0 24 24" width="20" height="20"><path d="M16.24 3.56l4.95 4.94c.78.79.78 2.05 0 2.84L12 20.53a4 4 0 01-2.83 1.17H4l1.59-1.59 8.49-8.48-4.95-4.95 2.83-2.83a2 2 0 012.83 0l1.45 1.45z" fill="currentColor"/></svg>
+              <span>Erase</span>
+            </button>
+          </div>
         </div>
 
         <div class="tool-section" id="furniture-panel" style="display:none;">
-          <h3>Furniture</h3>
-          <div id="furniture-catalog"></div>
+          <h3 class="section-toggle">Furniture <span class="toggle-arrow"></span></h3>
+          <div class="section-content" id="furniture-catalog"></div>
         </div>
 
         <div class="tool-section" id="templates-panel">
-          <h3>Templates</h3>
-          <button class="template-btn" data-template="studio">Studio Apt</button>
-          <button class="template-btn" data-template="living">Living Room</button>
-          <button class="template-btn" data-template="bedroom">Bedroom</button>
-          <button class="template-btn" data-template="lshaped">L-Shaped</button>
-          <button class="template-btn" data-template="openplan">Open Plan</button>
+          <h3 class="section-toggle">Templates <span class="toggle-arrow"></span></h3>
+          <div class="section-content">
+            <button class="template-btn" data-template="studio">Studio Apt</button>
+            <button class="template-btn" data-template="living">Living Room</button>
+            <button class="template-btn" data-template="bedroom">Bedroom</button>
+            <button class="template-btn" data-template="lshaped">L-Shaped</button>
+            <button class="template-btn" data-template="openplan">Open Plan</button>
+          </div>
         </div>
 
         <div class="tool-section">
-          <h3>Import</h3>
-          <label class="file-upload-btn">
-            Upload Floor Plan
-            <input type="file" id="image-upload" accept="image/*" hidden>
-          </label>
+          <h3 class="section-toggle">Import <span class="toggle-arrow"></span></h3>
+          <div class="section-content">
+            <label class="file-upload-btn">
+              Upload Floor Plan
+              <input type="file" id="image-upload" accept="image/*" hidden>
+            </label>
+          </div>
         </div>
       </aside>
 

@@ -23,12 +23,14 @@ body {
   color: var(--text);
   overflow: hidden;
   height: 100vh;
+  height: 100dvh;
 }
 
 #app {
   display: flex;
   flex-direction: column;
   height: 100vh;
+  height: 100dvh;
 }
 
 /* Header */
@@ -116,6 +118,20 @@ button:disabled {
   display: flex;
   flex: 1;
   overflow: hidden;
+  position: relative;
+}
+
+/* Toolbar toggle (hamburger) — hidden on desktop */
+#toolbar-toggle {
+  display: none;
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 30;
+  padding: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
 }
 
 /* Toolbar */
@@ -128,14 +144,49 @@ button:disabled {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  flex-shrink: 0;
 }
 
-.tool-section h3 {
+/* Collapsible sections */
+.section-toggle {
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 1px;
   color: var(--text-dim);
   margin-bottom: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.section-toggle:hover {
+  color: var(--text);
+}
+
+.toggle-arrow {
+  font-size: 8px;
+  transition: transform 0.2s;
+}
+
+.toggle-arrow::after {
+  content: "\25BC";
+}
+
+.section-toggle.collapsed .toggle-arrow {
+  transform: rotate(-90deg);
+}
+
+.section-content {
+  overflow: hidden;
+  transition: max-height 0.2s ease;
+  max-height: 500px;
+}
+
+.section-content.collapsed {
+  max-height: 0;
 }
 
 .tool-btn {
@@ -236,6 +287,7 @@ button:disabled {
   position: absolute;
   top: 0;
   left: 0;
+  touch-action: none;
 }
 
 #status-bar {
@@ -265,6 +317,7 @@ button:disabled {
   border-left: 1px solid var(--border);
   padding: 12px;
   overflow-y: auto;
+  flex-shrink: 0;
 }
 
 #tips-content {
@@ -318,6 +371,14 @@ button:disabled {
   cursor: cell;
 }
 
+#canvas-container.tool-move {
+  cursor: grab;
+}
+
+#canvas-container.tool-move.panning {
+  cursor: grabbing;
+}
+
 /* Keyboard shortcut hints */
 .tool-btn span {
   flex: 1;
@@ -334,6 +395,7 @@ button:disabled {
 .tool-btn[data-tool="door"]::after { content: "D"; }
 .tool-btn[data-tool="window"]::after { content: "N"; }
 .tool-btn[data-tool="furniture"]::after { content: "F"; }
+.tool-btn[data-tool="move"]::after { content: "M"; }
 .tool-btn[data-tool="erase"]::after { content: "E"; }
 
 /* Scrollbar */
@@ -348,4 +410,107 @@ button:disabled {
 ::-webkit-scrollbar-thumb {
   background: var(--border);
   border-radius: 3px;
+}
+
+/* ========= Mobile Responsive ========= */
+@media (max-width: 768px) {
+  #header {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 6px 12px;
+  }
+
+  #header h1 {
+    font-size: 14px;
+  }
+
+  #viz-toggles {
+    margin-left: 0;
+    gap: 8px;
+    order: 3;
+    width: 100%;
+  }
+
+  #viz-toggles label {
+    font-size: 12px;
+  }
+
+  #header-actions {
+    gap: 4px;
+  }
+
+  #header-actions button {
+    padding: 5px 8px;
+    font-size: 12px;
+  }
+
+  /* Show hamburger */
+  #toolbar-toggle {
+    display: block;
+  }
+
+  /* Toolbar slides in as overlay */
+  #toolbar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 20;
+    width: 180px;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.5);
+  }
+
+  #toolbar.open {
+    transform: translateX(0);
+  }
+
+  /* Overlay backdrop */
+  .toolbar-backdrop {
+    display: none;
+    position: absolute;
+    inset: 0;
+    z-index: 15;
+    background: rgba(0, 0, 0, 0.4);
+  }
+
+  .toolbar-backdrop.visible {
+    display: block;
+  }
+
+  /* Info panel below canvas on mobile */
+  #info-panel {
+    position: absolute;
+    bottom: 24px;
+    left: 8px;
+    right: 8px;
+    width: auto;
+    max-height: 200px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    z-index: 5;
+  }
+
+  #status-bar {
+    font-size: 10px;
+    gap: 10px;
+    padding: 3px 8px;
+  }
+
+  /* Larger touch targets */
+  .tool-btn {
+    padding: 10px 10px;
+    min-height: 44px;
+  }
+
+  .template-btn {
+    padding: 10px 10px;
+    min-height: 44px;
+  }
+
+  .furniture-item {
+    padding: 10px 8px;
+    min-height: 44px;
+  }
 }
