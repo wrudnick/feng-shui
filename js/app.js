@@ -492,9 +492,6 @@ function runSimulation() {
     simulationActive = true;
     btn.disabled = false;
 
-    // Generate tips
-    generateTips();
-
     setStatus('Simulation complete — toggle layers to visualize');
   });
 }
@@ -514,88 +511,6 @@ function updateVizTransform() {
     roomWidth: roomBounds.width,
     roomHeight: roomBounds.height,
   };
-}
-
-// --- Tips ---
-
-function generateTips() {
-  const panel = document.getElementById('info-panel');
-  const content = document.getElementById('tips-content');
-  panel.style.display = 'block';
-
-  const maxSpeed = grid.getMaxSpeed();
-  if (maxSpeed === 0) {
-    content.innerHTML = '<div class="tip-item"><span class="tip-warn">No flow detected. Make sure you have at least one door.</span></div>';
-    return;
-  }
-
-  const tips = [];
-
-  // Analyze flow coverage
-  let totalCells = 0;
-  let flowingCells = 0;
-  let stagnantCells = 0;
-  const stagnantThreshold = maxSpeed * 0.1;
-
-  for (let y = 1; y < grid.height - 1; y++) {
-    for (let x = 1; x < grid.width - 1; x++) {
-      if (!grid.isWall(x, y)) {
-        totalCells++;
-        const speed = grid.getSpeed(x, y);
-        if (speed > stagnantThreshold) flowingCells++;
-        else stagnantCells++;
-      }
-    }
-  }
-
-  const coverage = flowingCells / totalCells;
-  if (coverage > 0.6) {
-    tips.push({ label: 'Flow Coverage', text: `${Math.round(coverage * 100)}% — Good chi circulation`, cls: 'tip-good' });
-  } else if (coverage > 0.3) {
-    tips.push({ label: 'Flow Coverage', text: `${Math.round(coverage * 100)}% — Moderate. Consider repositioning furniture.`, cls: 'tip-warn' });
-  } else {
-    tips.push({ label: 'Flow Coverage', text: `${Math.round(coverage * 100)}% — Poor. Too many obstructions blocking flow.`, cls: 'tip-bad' });
-  }
-
-  // Check for stagnation
-  const stagnantPct = stagnantCells / totalCells;
-  if (stagnantPct > 0.5) {
-    tips.push({ label: 'Stagnation', text: 'High stagnation areas. Add a plant or mirror to activate chi.', cls: 'tip-bad' });
-  }
-
-  // Door count advice
-  if (editor.doors.length === 0) {
-    tips.push({ label: 'No Door', text: 'Add a door — chi needs an entry point!', cls: 'tip-bad' });
-  } else if (editor.doors.length >= 2) {
-    tips.push({ label: 'Multiple Doors', text: 'Multiple entries create cross-flow. Ensure pathways are clear.', cls: 'tip-warn' });
-  }
-
-  // Window advice
-  if (editor.windows.length === 0) {
-    tips.push({ label: 'Windows', text: 'Windows bring secondary chi. Consider adding them.', cls: 'tip-warn' });
-  }
-
-  // Furniture in center
-  const bounds = roomBounds;
-  const cx = bounds.x + bounds.width / 2;
-  const cy = bounds.y + bounds.height / 2;
-  for (const f of editor.furniture) {
-    if (f.x < cx + 40 && f.x + f.width > cx - 40 &&
-        f.y < cy + 40 && f.y + f.height > cy - 40) {
-      tips.push({ label: 'Center Blocked', text: `"${f.label}" is near room center. Keep the center open for health energy.`, cls: 'tip-warn' });
-      break;
-    }
-  }
-
-  // Poison arrows
-  const poisonItems = editor.furniture.filter(f => f.poisonArrow);
-  if (poisonItems.length > 0) {
-    tips.push({ label: 'Poison Arrows', text: `Sharp corners on ${poisonItems.map(f => f.label).join(', ')}. Round tables are preferred.`, cls: 'tip-warn' });
-  }
-
-  content.innerHTML = tips.map(t =>
-    `<div class="tip-item"><span class="tip-label ${t.cls}">${t.label}</span><br>${t.text}</div>`
-  ).join('');
 }
 
 // --- Status ---
