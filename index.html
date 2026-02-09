@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Feng Shui Flow</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <header id="header">
+      <h1>Feng Shui Flow</h1>
+      <div id="viz-toggles">
+        <label><input type="checkbox" id="toggle-particles" checked> Particles</label>
+        <label><input type="checkbox" id="toggle-heatmap"> Heatmap</label>
+        <label><input type="checkbox" id="toggle-bagua"> Bagua Map</label>
+      </div>
+      <div id="header-actions">
+        <button id="btn-undo" title="Undo (Ctrl+Z)">&#8630; Undo</button>
+        <button id="btn-redo" title="Redo (Ctrl+Y)">&#8631; Redo</button>
+        <button id="btn-simulate" class="primary">&#9654; Simulate</button>
+        <button id="btn-clear">Clear All</button>
+      </div>
+    </header>
+
+    <div id="main">
+      <aside id="toolbar">
+        <div class="tool-section">
+          <h3>Tools</h3>
+          <button class="tool-btn active" data-tool="select" title="Select / Move (V)">
+            <svg viewBox="0 0 24 24" width="20" height="20"><path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z" fill="currentColor"/></svg>
+            <span>Select</span>
+          </button>
+          <button class="tool-btn" data-tool="wall" title="Draw Wall (W)">
+            <svg viewBox="0 0 24 24" width="20" height="20"><rect x="2" y="10" width="20" height="4" fill="currentColor"/></svg>
+            <span>Wall</span>
+          </button>
+          <button class="tool-btn" data-tool="door" title="Place Door (D)">
+            <svg viewBox="0 0 24 24" width="20" height="20"><path d="M3 21V3h7v18H3zm7-9a1 1 0 100-2 1 1 0 000 2z" fill="currentColor"/><path d="M12 3h6v18h-6" stroke="currentColor" fill="none" stroke-width="1.5" stroke-dasharray="3 2"/></svg>
+            <span>Door</span>
+          </button>
+          <button class="tool-btn" data-tool="window" title="Place Window (N)">
+            <svg viewBox="0 0 24 24" width="20" height="20"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" fill="none" stroke-width="2"/><line x1="12" y1="3" x2="12" y2="21" stroke="currentColor" stroke-width="2"/><line x1="3" y1="12" x2="21" y2="12" stroke="currentColor" stroke-width="2"/></svg>
+            <span>Window</span>
+          </button>
+          <button class="tool-btn" data-tool="furniture" title="Place Furniture (F)">
+            <svg viewBox="0 0 24 24" width="20" height="20"><rect x="4" y="8" width="16" height="8" rx="2" fill="currentColor"/><rect x="6" y="16" width="2" height="4" fill="currentColor"/><rect x="16" y="16" width="2" height="4" fill="currentColor"/></svg>
+            <span>Furniture</span>
+          </button>
+          <button class="tool-btn" data-tool="erase" title="Erase (E)">
+            <svg viewBox="0 0 24 24" width="20" height="20"><path d="M16.24 3.56l4.95 4.94c.78.79.78 2.05 0 2.84L12 20.53a4 4 0 01-2.83 1.17H4l1.59-1.59 8.49-8.48-4.95-4.95 2.83-2.83a2 2 0 012.83 0l1.45 1.45z" fill="currentColor"/></svg>
+            <span>Erase</span>
+          </button>
+        </div>
+
+        <div class="tool-section" id="furniture-panel" style="display:none;">
+          <h3>Furniture</h3>
+          <div id="furniture-catalog"></div>
+        </div>
+
+        <div class="tool-section" id="templates-panel">
+          <h3>Templates</h3>
+          <button class="template-btn" data-template="studio">Studio Apt</button>
+          <button class="template-btn" data-template="living">Living Room</button>
+          <button class="template-btn" data-template="bedroom">Bedroom</button>
+          <button class="template-btn" data-template="lshaped">L-Shaped</button>
+          <button class="template-btn" data-template="openplan">Open Plan</button>
+        </div>
+
+        <div class="tool-section">
+          <h3>Import</h3>
+          <label class="file-upload-btn">
+            Upload Floor Plan
+            <input type="file" id="image-upload" accept="image/*" hidden>
+          </label>
+        </div>
+      </aside>
+
+      <div id="canvas-container">
+        <canvas id="main-canvas"></canvas>
+        <div id="status-bar">
+          <span id="status-coords">0, 0</span>
+          <span id="status-zoom">100%</span>
+          <span id="status-tool">Select</span>
+          <span id="status-msg"></span>
+        </div>
+      </div>
+
+      <aside id="info-panel" style="display:none;">
+        <h3>Feng Shui Tips</h3>
+        <div id="tips-content"></div>
+      </aside>
+    </div>
+  </div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
