@@ -412,54 +412,93 @@ button:disabled {
   border-radius: 3px;
 }
 
+/* Mobile-only elements hidden on desktop */
+.mobile-only {
+  display: none;
+}
+
+.layer-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  font-size: 13px;
+  color: var(--text-dim);
+  cursor: pointer;
+  user-select: none;
+}
+
+.layer-toggle:has(input:checked) {
+  color: var(--text);
+}
+
 /* ========= Mobile Responsive ========= */
 @media (max-width: 768px) {
   #header {
     flex-wrap: wrap;
-    gap: 8px;
-    padding: 6px 12px;
+    gap: 6px;
+    padding: 6px 10px;
   }
 
   #header h1 {
     font-size: 14px;
+    flex-shrink: 0;
   }
 
   #viz-toggles {
-    margin-left: 0;
-    gap: 8px;
-    order: 3;
-    width: 100%;
-  }
-
-  #viz-toggles label {
-    font-size: 12px;
+    display: none;
   }
 
   #header-actions {
     gap: 4px;
+    margin-left: auto;
   }
 
   #header-actions button {
     padding: 5px 8px;
-    font-size: 12px;
+    font-size: 11px;
+  }
+
+  /* Hide text on smallest screens, keep icons */
+  #btn-undo, #btn-redo {
+    font-size: 0;
+    padding: 6px 10px;
+  }
+
+  #btn-undo::before {
+    content: "\21B6";
+    font-size: 14px;
+  }
+
+  #btn-redo::before {
+    content: "\21B7";
+    font-size: 14px;
+  }
+
+  /* Show mobile-only elements */
+  .mobile-only {
+    display: block;
   }
 
   /* Show hamburger */
   #toolbar-toggle {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
-  /* Toolbar slides in as overlay */
+  /* Remove toolbar from flex flow entirely on mobile */
   #toolbar {
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     bottom: 0;
-    z-index: 20;
-    width: 180px;
+    z-index: 100;
+    width: 200px;
     transform: translateX(-100%);
     transition: transform 0.25s ease;
     box-shadow: 4px 0 20px rgba(0, 0, 0, 0.5);
+    padding-top: 12px;
   }
 
   #toolbar.open {
@@ -469,24 +508,24 @@ button:disabled {
   /* Overlay backdrop */
   .toolbar-backdrop {
     display: none;
-    position: absolute;
+    position: fixed;
     inset: 0;
-    z-index: 15;
-    background: rgba(0, 0, 0, 0.4);
+    z-index: 99;
+    background: rgba(0, 0, 0, 0.5);
   }
 
   .toolbar-backdrop.visible {
     display: block;
   }
 
-  /* Info panel below canvas on mobile */
+  /* Info panel floats over canvas on mobile */
   #info-panel {
     position: absolute;
-    bottom: 24px;
+    bottom: 28px;
     left: 8px;
     right: 8px;
     width: auto;
-    max-height: 200px;
+    max-height: 180px;
     border-radius: 8px;
     border: 1px solid var(--border);
     z-index: 5;
@@ -494,8 +533,13 @@ button:disabled {
 
   #status-bar {
     font-size: 10px;
-    gap: 10px;
+    gap: 8px;
     padding: 3px 8px;
+  }
+
+  /* Hide coords on mobile to save space */
+  #status-coords {
+    display: none;
   }
 
   /* Larger touch targets */

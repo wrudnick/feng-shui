@@ -66,12 +66,11 @@ function setupCollapsibleSections() {
 function setupMobileToolbar() {
   const toggleBtn = document.getElementById('toolbar-toggle');
   const toolbar = document.getElementById('toolbar');
-  const main = document.getElementById('main');
 
-  // Create backdrop element for mobile overlay
+  // Create backdrop element for mobile overlay (fixed positioning, on body)
   const backdrop = document.createElement('div');
   backdrop.className = 'toolbar-backdrop';
-  main.appendChild(backdrop);
+  document.body.appendChild(backdrop);
 
   function openToolbar() {
     toolbar.classList.add('open');
@@ -174,16 +173,24 @@ function setupHeaderButtons() {
     }
   });
 
-  // Viz toggles
-  document.getElementById('toggle-particles').addEventListener('change', (e) => {
-    showParticles = e.target.checked;
-  });
-  document.getElementById('toggle-heatmap').addEventListener('change', (e) => {
-    showHeatmap = e.target.checked;
-  });
-  document.getElementById('toggle-bagua').addEventListener('change', (e) => {
-    showBagua = e.target.checked;
-  });
+  // Viz toggles — sync header and mobile sidebar versions
+  function syncToggle(headerId, mobileId, setter) {
+    const header = document.getElementById(headerId);
+    const mobile = document.getElementById(mobileId);
+    header.addEventListener('change', (e) => {
+      setter(e.target.checked);
+      if (mobile) mobile.checked = e.target.checked;
+    });
+    if (mobile) {
+      mobile.addEventListener('change', (e) => {
+        setter(e.target.checked);
+        header.checked = e.target.checked;
+      });
+    }
+  }
+  syncToggle('toggle-particles', 'toggle-particles-mobile', (v) => { showParticles = v; });
+  syncToggle('toggle-heatmap', 'toggle-heatmap-mobile', (v) => { showHeatmap = v; });
+  syncToggle('toggle-bagua', 'toggle-bagua-mobile', (v) => { showBagua = v; });
 }
 
 function setupCanvasEvents() {
@@ -662,9 +669,12 @@ function init() {
   setupHeaderButtons();
   setupCanvasEvents();
 
-  // Center canvas
-  canvas.panX = canvas.displayWidth / 2 - 225;
-  canvas.panY = canvas.displayHeight / 2 - 200;
+  // Ensure canvas fills properly after CSS is applied
+  requestAnimationFrame(() => {
+    canvas.resize();
+    canvas.panX = canvas.displayWidth / 2 - 225;
+    canvas.panY = canvas.displayHeight / 2 - 200;
+  });
 
   setStatus('Draw walls, place doors, then simulate');
   render();
